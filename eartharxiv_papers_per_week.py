@@ -1,4 +1,6 @@
 import sys
+sys.path.insert(0, './API')
+
 import utils
 import datetime
 from Preprint import Preprint

@@ -1,4 +1,5 @@
 import sys
+sys.path.insert(0, './API')
 
 def outputDict(dict, year, month, outDir):
 
