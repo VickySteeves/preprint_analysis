@@ -1,85 +1,90 @@
 import sys
 sys.path.insert(0, './API')
 
-import utils
 import datetime
-from Preprint import Preprint
-from api_token import osf_token
 
-def printResults(d):
-        keylist = sorted(d.keys())
-        for key in keylist: print(key,d[key])
+def updateDict( dict, week ):
+  if week in dict:
+    dict[week] = dict[week] + 1
+  else:
+    dict[week] = 1
 
-# List to hold all our preprints
-preprints = []
+def printResults(preprints, postprints):
+  keyList = sorted(preprints.keys())
+  for key in keyList: print(key, preprints[key],postprints[key])
 
-# URLs for OSF API
+# command line inputs
+# logFile - full path to log file 
+logFile = sys.argv[1]
 
-# API URL to list all preprint providers
-api_url_providers = "https://api.osf.io/v2/preprint_providers"
+# seperator for log file
+sep = ';'
+sep2 = ":"
 
-# API URL to search/download preprints, NOTE: this is currently hard-coded to search EarthArXiv
-api_url_search = "https://api.osf.io/v2/preprints/?filter[provider]=eartharxiv"
+# dictionaries
+pre2017 = {}
+pos2017 = {}
+pre2018 = {}
+pos2018 = {}
+for i in range(52):
+  w = i + 1
+  pre2017[w] = 0
+  pre2018[w] = 0
+  pos2017[w] = 0
+  pos2018[w] = 0
 
-# Set up the headers to be sent as part of every API request
-# osf_token is unique to each user and needs to be obtained from OSF site, it's imported from api_token.py
-headers = {'Content-Type': 'application/json',
-           'Authorization': 'Bearer {0}'.format(osf_token)}
+# open the log file
+lFile = open(logFile, "r")
+for line in lFile:
 
-# Send a request to the search API, this example just asks for all preprints at EarthArXiv
-response = utils.queryAPI(api_url_search, headers)
+   parts = line.split(sep)
+   identifier = parts[0]
+   provider = parts[1]
+   doi = parts[2]
+   peer_review_doi = parts[3]
+   date_published = parts[4]
+   peer_review_date_published = parts[5]
+   title = parts[6]
+   authorList = parts[7]
+   keywordList = parts[8]
 
-# Check the response status code, 200 indicates everything worked as expected
-if response.status_code == 200:
+   authors = authorList.split(sep2)
+   keywords = keywordList.split(sep2)
 
-	# Extract the JSON data from the response
-	json_object = utils.getJSON( response ) 
+   p1 = date_published.split("-")
+   year1 = int(p1[0])
+   month1 = int(p1[1])
+   p1 = p1[2].split("T")
+   day1 = int(p1[0])
+   d1 = datetime.date(year1,month1,1)
+   week = datetime.date(year1,month1,day1).isocalendar()[1]
+   if (peer_review_doi != ""):
+      p2 = peer_review_date_published.split("-")
+      year2 = p2[0]
+      month2 = p2[1]
+      if ( (year2 == "") or (month2 == "") ):
+         continue
+      else:
+         d2 = datetime.date(int(year2),int(month2),1)
+         diff = (d2 - d1).days
+         if ( diff < 0 ):
+           if int(year1) == 2017:
+             updateDict( pos2017, week )
+           else:
+             updateDict( pos2018, week )
+         else:
+           if int(year1) == 2017:
+             updateDict( pre2017, week )
+           else:
+             updateDict( pre2018, week )
+   else: # preprint
+      if int(year1) == 2017:
+         updateDict( pre2017, week )
+      else:
+         updateDict( pre2018, week )
 
-	# Total number of preprints in the results
-	total_preprints = json_object['links']['meta']['total']
+# close the log file   
+lFile.close()
 
-	# Parse all the preprints in the response (the current 'page' of results)
-	utils.parsePreprints( preprints, json_object, headers )
-
-	# The API returns 10 preprints per "page". We need to look at the Links
-	# data to see if there are additional pages. 
-	next = json_object['links']['next']
-
-	# Send a request to the search API, this time for the next page
-	while( next != None ):
-		nextResponse = utils.queryAPI(next, headers)
-		json_object = utils.getJSON( nextResponse ) 
-		utils.parsePreprints( preprints, json_object, headers )
-		next = json_object['links']['next']
-
-else:
-
-	# Something went wrong with the API call/response
-	print( "Error connecting to API, HTTP status code is: ", response.status_code )
-
-s2017 = {}
-s2018 = {}
-
-# Loop over all the preprints we found
-for preprint in preprints:
-        date = preprint.getDatePublished()
-        keywords = preprint.getKeywords()
-        if (date != None):
-                parts = date.split("T")
-                parts = parts[0].split("-")
-                year = int(parts[0])
-                month = int(parts[1])
-                day = int(parts[2])
-                week = datetime.date(year,month,day).isocalendar()[1]
-                if year == 2017:
-                        if week in s2017:
-                                s2017[week] = s2017[week]+1
-                        else: s2017[week] = 1
-                if year == 2018:
-                        if week in s2018:
-                                s2018[week] = s2018[week]+1
-                        else: s2018[week] = 1
-
-print("Weekly submissions")
-printResults(s2017)
-printResults(s2018)
+printResults(pre2017, pos2017)
+printResults(pre2018, pos2018)
