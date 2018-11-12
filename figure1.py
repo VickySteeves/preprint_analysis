@@ -48,7 +48,7 @@ p1 = plt.bar(ind, tPre, width, align='edge')
 p2 = plt.bar(ind, tPos, width, align='edge', bottom=tPre)
 plt.ylabel('Papers at EarthArXiv')
 plt.xlabel('Weeks Since Inception')
-plt.title('Cummulative Number of Ppaers at EarthArXiv')
+plt.title('Cummulative Number of Papers at EarthArXiv')
 plt.xticks(ticks)
 plt.legend((p1[0], p2[0]), ('Preprints', 'Postprints'))
 
