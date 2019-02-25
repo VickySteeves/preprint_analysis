@@ -39,6 +39,7 @@ for line in lFile:
    pre_postprints += 1
 
    parts = line.split(sep)
+
    identifier = parts[0]
    provider = parts[1]
    doi = parts[2]
@@ -81,7 +82,7 @@ for line in lFile:
       else:
          d2 = datetime.date(int(year2),int(month2),1)
          diff = (d2 - d1).days
-         if ( diff < 0 ):
+         if ( diff <= 0 ):
            postprints += 1
          else:
            delay.append(diff)
