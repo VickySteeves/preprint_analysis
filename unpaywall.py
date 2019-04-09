@@ -49,12 +49,15 @@ for line in lFile:
      response = requests.get(url, headers=headers)
      if ( response.status_code == 200 ):
         json_object = json.loads(response.content.decode('utf-8'))
-        r = json_object['is_oa']
+        r = json_object['journal_is_in_doaj']
         journal = json_object['journal_name']
         published_date = json_object['published_date']
         if (journal not in journals):
            ujournals += 1
            journals.append(journal)
+        
+        #the real meaning of this is if the journal where paper is published is also indexed by the DOAJ.
+        # so this is gold OA, not hybrid.. 
         if ( r == True ):
           isOA += 1
         if ( r == False ):
