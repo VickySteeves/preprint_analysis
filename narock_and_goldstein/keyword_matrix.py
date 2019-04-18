@@ -8,31 +8,20 @@ arxives = ["EartharXiv", "EngrXiv", "LawarXiv", "LISSA", "MarXiv", "MindrXiv", "
 
 x = np.nan
 
-# total papers at each arxiv - used to normalize plot
-eartharxiv = 567
-lissa = 139
-mindrxiv = 121
-engrxiv = 362
-lawarxiv = 905
-marxiv = 324
-paleorxiv = 112
-psyarxiv = 3540
-socarxiv = 3034 
-
 data = np.array( [
-  [x, math.log10(17), math.log10(9), math.log10(2), math.log10(14), math.log10(0.1), math.log10(2), math.log10(3),  math.log10(15)],
-  [x,  x, math.log10(0.1), math.log10(0.1),  math.log10(0.1), math.log10(0.1), math.log10(0.1), math.log10(0.1),   math.log10(0.1)],
-  [x,  x, x, math.log10(7),  math.log10(5), math.log10(0.1), math.log10(0.1), math.log10(6), math.log10(152)],
-  [x,  x, x, x,  math.log10(1), math.log10(0.1), math.log10(0.1), math.log10(1),   math.log10(8)],
-  [x,  x, x, x,  x, math.log10(0.1), math.log10(0.1), math.log10(2),   math.log10(7)], 
-  [x,  x, x, x,  x, x, math.log10(0.1), math.log10(0.1),   math.log10(0.1)], 
-  [x,  x, x, x,  x, x, x, math.log10(0.1),   math.log10(0.1)], 
-  [x,  x, x, x,  x, x, x, x,  math.log10(23)], 
+  [x, 0.1, 0.02, 0.1, 0.22, 0.15, 0.03, 0.03,  0.05], # eartharxiv
+  [x,  x, 0, 0,  0, 0, 0, 0, 0], #engrxiv
+  [x,  x, x, 0.35, 0.15, 0.23, 0, 0.03, 0.27], # lawarxiv
+  [x,  x, x, x,  0.33, 0.19, 0, 0.33, 0.65], # LISSA
+  [x,  x, x, x,  x, 0.19, 0, 0.38, 0.44], # marxiv
+  [x,  x, x, x,  x, x, 0, 0.3, 0.53], # mindarxiv
+  [x,  x, x, x,  x, x, x, 0, 0], # paleorxiv
+  [x,  x, x, x,  x, x, x, x, 0.22], # psyarxiv
   ])
 
 
 fig, ax = plt.subplots(figsize=(10, 7))
-im = ax.imshow(data, cmap=cm.get_cmap('Greys'))
+im = ax.imshow(data, cmap=cm.get_cmap('Reds'))
 fig.colorbar(im)
 
 # set up x and y axis
@@ -43,7 +32,7 @@ ax.set_yticks(np.arange(len(arxives)))
 ax.set_xticklabels(arxives)
 ax.set_yticklabels(arxives)
 
-ax.set_title("Keywords in Common (Log Scale)")
+ax.set_title("Keywords in Common")
 fig.tight_layout()
 #ax.grid()
 plt.show()

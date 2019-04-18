@@ -1,4 +1,7 @@
 import sys
+import json
+import requests
+from datetime import date
 sys.path.insert(0, './API')
 
 import datetime
@@ -16,6 +19,7 @@ def printResults(preprints, postprints):
 # command line inputs
 # logFile - full path to log file 
 logFile = sys.argv[1]
+email = sys.argv[2]
 
 # seperator for log file
 sep = ';'
@@ -26,12 +30,16 @@ pre2017 = {}
 pos2017 = {}
 pre2018 = {}
 pos2018 = {}
+pre2019 = {}
+pos2019 = {}
 for i in range(52):
   w = i + 1
   pre2017[w] = 0
   pre2018[w] = 0
+  pre2019[w] = 0
   pos2017[w] = 0
   pos2018[w] = 0
+  pos2019[w] = 0
 
 # open the log file
 lFile = open(logFile, "r")
@@ -59,32 +67,55 @@ for line in lFile:
    d1 = datetime.date(year1,month1,1)
    week = datetime.date(year1,month1,day1).isocalendar()[1]
    if (peer_review_doi != ""):
-      p2 = peer_review_date_published.split("-")
-      year2 = p2[0]
-      month2 = p2[1]
-      if ( (year2 == "") or (month2 == "") ):
-         continue
-      else:
-         d2 = datetime.date(int(year2),int(month2),1)
-         diff = (d2 - d1).days
-         if ( diff < 0 ):
-           if int(year1) == 2017:
-             updateDict( pos2017, week )
+
+      headers = {'Content-Type': 'application/json'}
+      p = peer_review_doi.split("/")
+      l = len(p)
+      if (l == 5):
+        url = "https://api.unpaywall.org/v2/" + p[-2].strip() + "/" + p[-1].strip() + "?email=" + email.strip()
+      if (l == 6):
+        url = "https://api.unpaywall.org/v2/" + p[-3].strip() + "/" + p[-2].strip() + "/" + p[-1].strip() + "?email=" + email.strip()
+      response = requests.get(url, headers=headers)
+      if ( response.status_code == 200 ):
+        json_object = json.loads(response.content.decode('utf-8'))
+        published_date = json_object['published_date']
+
+        # publication delay
+        preprint = date_published.split("T")
+        preprint = preprint[0].split("-")
+        if ( published_date is None ):
+           continue 
+        else:
+           j = published_date.split("-")
+           d0 = date( year1, month1, day1 )
+           d1 = date(int(j[0]), int(j[1]), int(j[2]))        
+           delta = d1 - d0
+           if (delta.days <= 0):
+              if ( year1 == 2017 ):
+                updateDict( pos2017, week ) 
+              elif ( year1 == 2018 ):
+                updateDict( pos2018, week )
+              else:
+                updateDict( pos2019, week )
            else:
-             updateDict( pos2018, week )
-         else:
-           if int(year1) == 2017:
-             updateDict( pre2017, week )
-           else:
-             updateDict( pre2018, week )
-   else: # preprint
-      if int(year1) == 2017:
+              if ( year1 == 2017 ):
+                updateDict( pre2017, week )
+              elif ( year1 == 2018 ):
+                updateDict( pre2018, week )
+              else:
+                updateDict( pre2019, week )
+
+   else:
+       if ( year1 == 2017 ):
          updateDict( pre2017, week )
-      else:
+       elif ( year1 == 2018 ):
          updateDict( pre2018, week )
+       else:
+         updateDict( pre2019, week )
 
 # close the log file   
 lFile.close()
 
 printResults(pre2017, pos2017)
 printResults(pre2018, pos2018)
+#printResults(pre2019, pos2019)
