@@ -6,5 +6,6 @@ The analysis code in this repo is
 * keywordsOverTime.py - parses log file from parseLog.py to compute monthly usage of keywords
 * keywordsOverTimeSpecificValue.py - parses log files from parseLog.py to find a specific keyword and output its usage over time
 
-[![DOI](https://zenodo.org/badge/153806329.svg)](https://zenodo.org/badge/latestdoi/153806329)
+Version 2.0, [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2649580.svg)](https://doi.org/10.5281/zenodo.2649580)
+Version 1.0, [![DOI](https://zenodo.org/badge/153806329.svg)](https://zenodo.org/badge/latestdoi/153806329)
 
