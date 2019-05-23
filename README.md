@@ -7,6 +7,8 @@ The analysis code in this repo is
 * keywordsOverTimeSpecificValue.py - parses log files from parseLog.py to find a specific keyword and output its usage over time
 
 
+Version 2.1, [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3204815.svg)](https://doi.org/10.5281/zenodo.3204815)
+
 Version 2.0, [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2649580.svg)](https://doi.org/10.5281/zenodo.2649580)  
 Version 2.0 dataset, https://doi.org/10.6084/m9.figshare.8030819.v1
 
